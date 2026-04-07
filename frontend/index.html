@@ -1,267 +1,379 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Secure Encryption Tool</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SCRYPT | Ultra-Secure</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #05070a;
+            --card-bg: rgba(15, 23, 42, 0.6);
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --accent: #22d3ee;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --success: #10b981;
+        }
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+        body {
+            margin: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: radial-gradient(circle at 0% 0%, #1e1b4b 0%, #05070a 50%),
+                        radial-gradient(circle at 100% 100%, #312e81 0%, #05070a 50%);
+            color: var(--text-main);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
 
-<style>
-body {
-  margin:0;
-  font-family: 'Inter', sans-serif;
-  background: linear-gradient(135deg,#0f172a,#1e293b);
-  color:white;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  height:100vh;
-}
+        /* Container & Glassmorphism */
+        .glass-card {
+            width: 100%;
+            max-width: 500px;
+            padding: 2.5rem;
+            border-radius: 28px;
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-.container {
-  width: 600px;
-  padding: 2rem;
-  border-radius: 20px;
-  background: rgba(255,255,255,0.05);
-  backdrop-filter: blur(20px);
-  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-}
+        h1 {
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+            text-align: center;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
 
-h2 {
-  text-align:center;
-  margin-bottom:20px;
-}
+        p.subtitle {
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+        }
 
-textarea, input {
-  width:100%;
-  padding:10px;
-  border:none;
-  border-radius:10px;
-  margin-top:5px;
-  background:rgba(255,255,255,0.1);
-  color:white;
-}
+        /* Modern Tabs */
+        .tab-nav {
+            display: flex;
+            background: rgba(0,0,0,0.2);
+            padding: 5px;
+            border-radius: 14px;
+            margin-bottom: 2rem;
+            gap: 5px;
+        }
 
-textarea {
-  min-height:100px;
-}
+        .tab-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 10px;
+            background: transparent;
+            color: var(--text-dim);
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+        }
 
-button {
-  margin-top:10px;
-  padding:10px;
-  width:100%;
-  border:none;
-  border-radius:10px;
-  font-weight:600;
-  cursor:pointer;
-}
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+        }
 
-.encrypt {
-  background: linear-gradient(135deg,#3b82f6,#06b6d4);
-}
+        /* Inputs */
+        .input-group {
+            margin-bottom: 1.5rem;
+            display: none; /* Hidden by default for logic flow */
+            animation: fadeIn 0.4s ease forwards;
+        }
 
-.decrypt {
-  background: linear-gradient(135deg,#22c55e,#84cc16);
-}
+        .input-group.visible {
+            display: block;
+        }
 
-.output {
-  margin-top:15px;
-  background:rgba(255,255,255,0.1);
-  padding:10px;
-  border-radius:10px;
-  word-break:break-all;
-}
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
 
-.tabs {
-  display:flex;
-  margin-bottom:15px;
-}
+        textarea, input[type="password"], input[type="text"] {
+            width: 100%;
+            box-sizing: border-box;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 14px;
+            color: white;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: 0.3s;
+        }
 
-.tab {
-  flex:1;
-  padding:10px;
-  text-align:center;
-  cursor:pointer;
-  background:rgba(255,255,255,0.05);
-}
+        textarea:focus, input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(0, 0, 0, 0.4);
+        }
 
-.active {
-  background: linear-gradient(135deg,#6366f1,#9333ea);
-}
-</style>
+        /* Drop Zone */
+        .drop-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.3s;
+            background: rgba(255, 255, 255, 0.02);
+            margin-bottom: 1rem;
+        }
+
+        .drop-zone:hover, .drop-zone.drag-over {
+            border-color: var(--primary);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .drop-zone i {
+            display: block;
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        /* Action Buttons */
+        .btn-action {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .btn-encrypt {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+        .btn-decrypt {
+            background: linear-gradient(135deg, var(--success), #06b6d4);
+            color: white;
+        }
+
+        .btn-action:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        /* Progress & Output */
+        .progress-container {
+            display: none;
+            margin-top: 1.5rem;
+        }
+
+        .progress-bar-bg {
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: var(--accent);
+            transition: width 0.3s;
+        }
+
+        .result-box {
+            display: none;
+            margin-top: 1.5rem;
+            padding: 15px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px;
+            word-break: break-all;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
-
 <body>
 
-<div class="container">
-  <h2>🔐 Encryption Tool</h2>
+<div class="glass-card">
+    <h1>SCRYPT PRO</h1>
+    <p class="subtitle">Secure End-to-End Encryption</p>
 
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('enc', this)">Encrypt</div>
-    <div class="tab" onclick="switchTab('dec', this)">Decrypt</div>
-  </div>
+    <div class="tab-nav">
+        <button class="tab-btn active" onclick="showTab('text-mode')">Text</button>
+        <button class="tab-btn" onclick="showTab('file-mode')">Files</button>
+    </div>
 
-  <!-- Encrypt -->
-  <div id="enc">
-    <label>Text</label>
-    <textarea id="text"></textarea>
+    <div id="text-mode" class="mode-container">
+        <div class="input-group visible">
+            <label>Input Content</label>
+            <textarea id="textContent" rows="4" placeholder="Paste your message or cipher text here..." oninput="checkTextInput()"></textarea>
+        </div>
 
-    <label>Password</label>
-    <input type="password" id="password">
+        <div id="textStep2" class="input-group">
+            <label>Master Password</label>
+            <input type="password" id="textPass" placeholder="Enter key to lock/unlock">
+            
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-action btn-encrypt" onclick="processText('encrypt')">Encrypt</button>
+                <button class="btn-action btn-decrypt" onclick="processText('decrypt')">Decrypt</button>
+            </div>
+        </div>
+        <div id="textResult" class="result-box"></div>
+    </div>
 
-    <button class="encrypt" onclick="encrypt()">Encrypt</button>
+    <div id="file-mode" class="mode-container" style="display: none;">
+        <div class="drop-zone" id="dropZone">
+            <input type="file" id="fileInput" hidden>
+            <span id="dropText">✨ Drop file here or click to browse</span>
+            <div id="fileSelected" style="display:none; color: var(--accent); font-weight: 600;"></div>
+        </div>
 
-    <div class="output" id="encOut"></div>
-  </div>
+        <div id="fileStep2" class="input-group">
+            <label>Master Password</label>
+            <input type="password" id="filePass" placeholder="Password for this file">
+            
+            <div style="display: flex; gap: 10px;">
+                <button class="btn-action btn-encrypt" onclick="processFile('encrypt')">Encrypt</button>
+                <button class="btn-action btn-decrypt" onclick="processFile('decrypt')">Decrypt</button>
+            </div>
+        </div>
 
-  <!-- Decrypt -->
-  <div id="dec" style="display:none">
-    <label>Encrypted Text</label>
-    <textarea id="cipher"></textarea>
-
-    <label>Password</label>
-    <input type="password" id="decPassword">
-
-    <button class="decrypt" onclick="decrypt()">Decrypt</button>
-
-    <div class="output" id="decOut"></div>
-  </div>
-  <h3>📁 File Encryption</h3>
-<hr style="margin:20px 0">
-<label>Select File</label>
-<input type="file" id="fileInput">
-
-<label>Password</label>
-<input type="password" id="filePassword">
-
-<button class="encrypt" onclick="encryptFile()">Encrypt File</button>
-
-<hr style="margin:20px 0">
-
-<h3>📁 File Decryption</h3>
-
-<label>Encrypted File (.enc)</label>
-<input type="file" id="decFileInput">
-
-<label>Password</label>
-<input type="password" id="decFilePassword">
-
-<button class="decrypt" onclick="decryptFile()">Decrypt File</button>
-
+        <div class="progress-container" id="progCont">
+            <div class="progress-bar-bg"><div class="progress-fill" id="progFill"></div></div>
+            <p style="font-size: 0.7rem; color: var(--text-dim); margin-top: 5px; text-align: center;">Processing Securely...</p>
+        </div>
+    </div>
 </div>
 
 <script>
-function switchTab(tab, el) {
-  document.getElementById("enc").style.display = tab === 'enc' ? 'block' : 'none';
-  document.getElementById("dec").style.display = tab === 'dec' ? 'block' : 'none';
-
-  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-  el.classList.add("active");
-}
-
-// Encrypt
-async function encrypt() {
-  const text = document.getElementById("text").value;
-  const password = document.getElementById("password").value;
-
-  const form = new FormData();
-  form.append("text", text);
-  form.append("password", password);
-
-  const res = await fetch("http://127.0.0.1:8000/encrypt-text", {
-    method: "POST",
-    body: form
-  });
-
-  const data = await res.json();
-  document.getElementById("encOut").innerText = data.encrypted;
-}
-
-// Decrypt
-async function decrypt() {
-  const cipher = document.getElementById("cipher").value;
-  const password = document.getElementById("decPassword").value;
-
-  const form = new FormData();
-  form.append("cipher", cipher);
-  form.append("password", password);
-
-  const res = await fetch("http://127.0.0.1:8000/decrypt-text", {
-    method: "POST",
-    body: form
-  });
-
-  const data = await res.json();
-  document.getElementById("decOut").innerText = data.decrypted;
-}
-
-// FILE ENCRYPT
-async function encryptFile() {
-  try {
-    const file = document.getElementById("fileInput").files[0];
-    const password = document.getElementById("filePassword").value;
-
-    if (!file || !password) {
-      alert("Select file and enter password");
-      return;
+    // Tab Switching
+    function showTab(mode) {
+        document.querySelectorAll('.mode-container').forEach(m => m.style.display = 'none');
+        document.getElementById(mode).style.display = 'block';
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        event.target.classList.add('active');
     }
 
-    const form = new FormData();
-    form.append("file", file);
-    form.append("password", password);
-
-    const res = await fetch("http://127.0.0.1:8000/encrypt-file", {
-      method: "POST",
-      body: form
-    });
-
-    const blob = await res.blob();
-
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = file.name + ".enc";
-    a.click();
-
-  } catch (err) {
-    alert("Error: " + err.message);
-  }
-}
-
-// FILE DECRYPT
-async function decryptFile() {
-  try {
-    const file = document.getElementById("decFileInput").files[0];
-    const password = document.getElementById("decFilePassword").value;
-
-    if (!file || !password) {
-      alert("Select file and enter password");
-      return;
+    // Logic Flow: Show password only when text exists
+    function checkTextInput() {
+        const val = document.getElementById('textContent').value;
+        const step2 = document.getElementById('textStep2');
+        if(val.length > 3) {
+            step2.classList.add('visible');
+        } else {
+            step2.classList.remove('visible');
+        }
     }
 
-    const form = new FormData();
-    form.append("file", file);
-    form.append("password", password);
+    // File Drag & Drop Logic
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
 
-    const res = await fetch("http://127.0.0.1:8000/decrypt-file", {
-      method: "POST",
-      body: form
-    });
+    dropZone.onclick = () => fileInput.click();
+    
+    fileInput.onchange = () => {
+        if(fileInput.files.length > 0) {
+            const fileName = fileInput.files[0].name;
+            document.getElementById('dropText').style.display = 'none';
+            document.getElementById('fileSelected').style.display = 'block';
+            document.getElementById('fileSelected').innerText = "📄 " + fileName;
+            document.getElementById('fileStep2').classList.add('visible');
+        }
+    };
 
-    const blob = await res.blob();
+    // Generic API calls (Updated to handle both Enc/Dec logically)
+    async function processText(action) {
+        const text = document.getElementById('textContent').value;
+        const pass = document.getElementById('textPass').value;
+        const out = document.getElementById('textResult');
 
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
+        if(!pass) return alert("Please enter a password");
 
-    // 🔥 SMART NAME FIX
-    a.download = file.name.replace(".enc", "");
+        const endpoint = action === 'encrypt' ? 'encrypt-text' : 'decrypt-text';
+        const bodyKey = action === 'encrypt' ? 'text' : 'cipher';
+        
+        const form = new FormData();
+        form.append(bodyKey, text);
+        form.append("password", pass);
 
-    a.click();
+        try {
+            const res = await fetch(`http://127.0.0.1:8000/${endpoint}`, {method: "POST", body: form});
+            const data = await res.json();
+            out.innerText = action === 'encrypt' ? data.encrypted : data.decrypted;
+            out.style.display = 'block';
+            out.style.background = action === 'encrypt' ? 'rgba(99, 102, 241, 0.1)' : 'rgba(16, 185, 129, 0.1)';
+        } catch (e) {
+            alert("Server Connection Failed. Is the backend running?");
+        }
+    }
 
-  } catch (err) {
-    alert("Error: " + err.message);
-  }
-}
+    async function processFile(action) {
+        const file = fileInput.files[0];
+        const pass = document.getElementById('filePass').value;
+        const prog = document.getElementById('progCont');
+        const fill = document.getElementById('progFill');
+
+        if(!file || !pass) return alert("File and password required!");
+
+        prog.style.display = 'block';
+        fill.style.width = "0%";
+        
+        const endpoint = action === 'encrypt' ? 'encrypt-file' : 'decrypt-file';
+        const form = new FormData();
+        form.append("file", file);
+        form.append("password", pass);
+
+        // Simulated progress (Backend fetch doesn't native progress easily without XHR)
+        let i = 0;
+        let int = setInterval(() => { i += 5; fill.style.width = i + "%"; if(i>=90) clearInterval(int); }, 100);
+
+        try {
+            const res = await fetch(`http://127.0.0.1:8000/${endpoint}`, {method: "POST", body: form});
+            const blob = await res.blob();
+            
+            fill.style.width = "100%";
+            setTimeout(() => {
+                const a = document.createElement("a");
+                a.href = URL.createObjectURL(blob);
+                a.download = action === 'encrypt' ? file.name + ".enc" : file.name.replace(".enc", "");
+                a.click();
+                prog.style.display = 'none';
+            }, 500);
+        } catch (e) {
+            alert("Error processing file.");
+            prog.style.display = 'none';
+        }
+    }
 </script>
-
 </body>
 </html>
