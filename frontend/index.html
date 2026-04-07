@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Secure Encryption Tool</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+body {
+  margin:0;
+  font-family: 'Inter', sans-serif;
+  background: linear-gradient(135deg,#0f172a,#1e293b);
+  color:white;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+}
+
+.container {
+  width: 600px;
+  padding: 2rem;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.05);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+}
+
+h2 {
+  text-align:center;
+  margin-bottom:20px;
+}
+
+textarea, input {
+  width:100%;
+  padding:10px;
+  border:none;
+  border-radius:10px;
+  margin-top:5px;
+  background:rgba(255,255,255,0.1);
+  color:white;
+}
+
+textarea {
+  min-height:100px;
+}
+
+button {
+  margin-top:10px;
+  padding:10px;
+  width:100%;
+  border:none;
+  border-radius:10px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+.encrypt {
+  background: linear-gradient(135deg,#3b82f6,#06b6d4);
+}
+
+.decrypt {
+  background: linear-gradient(135deg,#22c55e,#84cc16);
+}
+
+.output {
+  margin-top:15px;
+  background:rgba(255,255,255,0.1);
+  padding:10px;
+  border-radius:10px;
+  word-break:break-all;
+}
+
+.tabs {
+  display:flex;
+  margin-bottom:15px;
+}
+
+.tab {
+  flex:1;
+  padding:10px;
+  text-align:center;
+  cursor:pointer;
+  background:rgba(255,255,255,0.05);
+}
+
+.active {
+  background: linear-gradient(135deg,#6366f1,#9333ea);
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+  <h2>🔐 Encryption Tool</h2>
+
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('enc')">Encrypt</div>
+    <div class="tab" onclick="switchTab('dec')">Decrypt</div>
+  </div>
+
+  <!-- Encrypt -->
+  <div id="enc">
+    <label>Text</label>
+    <textarea id="text"></textarea>
+
+    <label>Password</label>
+    <input type="password" id="password">
+
+    <button class="encrypt" onclick="encrypt()">Encrypt</button>
+
+    <div class="output" id="encOut"></div>
+  </div>
+
+  <!-- Decrypt -->
+  <div id="dec" style="display:none">
+    <label>Encrypted Text</label>
+    <textarea id="cipher"></textarea>
+
+    <label>Password</label>
+    <input type="password" id="decPassword">
+
+    <button class="decrypt" onclick="decrypt()">Decrypt</button>
+
+    <div class="output" id="decOut"></div>
+  </div>
+
+</div>
+
+<script>
+function switchTab(tab) {
+  document.getElementById("enc").style.display = tab === 'enc' ? 'block' : 'none';
+  document.getElementById("dec").style.display = tab === 'dec' ? 'block' : 'none';
+
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  event.target.classList.add("active");
+}
+
+// Encrypt
+async function encrypt() {
+  const text = document.getElementById("text").value;
+  const password = document.getElementById("password").value;
+
+  const form = new FormData();
+  form.append("text", text);
+  form.append("password", password);
+
+  const res = await fetch("http://127.0.0.1:8000/encrypt-text", {
+    method: "POST",
+    body: form
+  });
+
+  const data = await res.json();
+  document.getElementById("encOut").innerText = data.encrypted;
+}
+
+// Decrypt
+async function decrypt() {
+  const cipher = document.getElementById("cipher").value;
+  const password = document.getElementById("decPassword").value;
+
+  const form = new FormData();
+  form.append("cipher", cipher);
+  form.append("password", password);
+
+  const res = await fetch("http://127.0.0.1:8000/decrypt-text", {
+    method: "POST",
+    body: form
+  });
+
+  const data = await res.json();
+  document.getElementById("decOut").innerText = data.decrypted;
+}
+</script>
+
+</body>
+</html>
