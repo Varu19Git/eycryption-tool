@@ -97,8 +97,8 @@ button {
   <h2>🔐 Encryption Tool</h2>
 
   <div class="tabs">
-    <div class="tab active" onclick="switchTab('enc')">Encrypt</div>
-    <div class="tab" onclick="switchTab('dec')">Decrypt</div>
+    <div class="tab active" onclick="switchTab('enc', this)">Encrypt</div>
+    <div class="tab" onclick="switchTab('dec', this)">Decrypt</div>
   </div>
 
   <!-- Encrypt -->
@@ -126,16 +126,37 @@ button {
 
     <div class="output" id="decOut"></div>
   </div>
+  <h3>📁 File Encryption</h3>
+<hr style="margin:20px 0">
+<label>Select File</label>
+<input type="file" id="fileInput">
+
+<label>Password</label>
+<input type="password" id="filePassword">
+
+<button class="encrypt" onclick="encryptFile()">Encrypt File</button>
+
+<hr style="margin:20px 0">
+
+<h3>📁 File Decryption</h3>
+
+<label>Encrypted File (.enc)</label>
+<input type="file" id="decFileInput">
+
+<label>Password</label>
+<input type="password" id="decFilePassword">
+
+<button class="decrypt" onclick="decryptFile()">Decrypt File</button>
 
 </div>
 
 <script>
-function switchTab(tab) {
+function switchTab(tab, el) {
   document.getElementById("enc").style.display = tab === 'enc' ? 'block' : 'none';
   document.getElementById("dec").style.display = tab === 'dec' ? 'block' : 'none';
 
   document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-  event.target.classList.add("active");
+  el.classList.add("active");
 }
 
 // Encrypt
@@ -172,6 +193,73 @@ async function decrypt() {
 
   const data = await res.json();
   document.getElementById("decOut").innerText = data.decrypted;
+}
+
+// FILE ENCRYPT
+async function encryptFile() {
+  try {
+    const file = document.getElementById("fileInput").files[0];
+    const password = document.getElementById("filePassword").value;
+
+    if (!file || !password) {
+      alert("Select file and enter password");
+      return;
+    }
+
+    const form = new FormData();
+    form.append("file", file);
+    form.append("password", password);
+
+    const res = await fetch("http://127.0.0.1:8000/encrypt-file", {
+      method: "POST",
+      body: form
+    });
+
+    const blob = await res.blob();
+
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = file.name + ".enc";
+    a.click();
+
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+}
+
+// FILE DECRYPT
+async function decryptFile() {
+  try {
+    const file = document.getElementById("decFileInput").files[0];
+    const password = document.getElementById("decFilePassword").value;
+
+    if (!file || !password) {
+      alert("Select file and enter password");
+      return;
+    }
+
+    const form = new FormData();
+    form.append("file", file);
+    form.append("password", password);
+
+    const res = await fetch("http://127.0.0.1:8000/decrypt-file", {
+      method: "POST",
+      body: form
+    });
+
+    const blob = await res.blob();
+
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+
+    // 🔥 SMART NAME FIX
+    a.download = file.name.replace(".enc", "");
+
+    a.click();
+
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
 }
 </script>
 

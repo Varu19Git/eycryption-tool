@@ -67,13 +67,18 @@ async def decrypt_text(cipher: str = Form(...), password: str = Form(...)):
 async def encrypt_file(file: UploadFile = File(...), password: str = Form(...)):
     content = await file.read()
 
+    # store filename + separator
+    filename_bytes = (file.filename + "||").encode()
+
+    combined = filename_bytes + content
+
     salt = os.urandom(16)
     iv = os.urandom(12)
 
     key = derive_key(password, salt)
     aes = AESGCM(key)
 
-    encrypted = aes.encrypt(iv, content, None)
+    encrypted = aes.encrypt(iv, combined, None)
 
     final = salt + iv + encrypted
 
@@ -82,7 +87,6 @@ async def encrypt_file(file: UploadFile = File(...), password: str = Form(...)):
         media_type="application/octet-stream",
         headers={"Content-Disposition": f"attachment; filename={file.filename}.enc"}
     )
-
 # 📁 FILE DECRYPT
 @app.post("/decrypt-file")
 async def decrypt_file(file: UploadFile = File(...), password: str = Form(...)):
@@ -97,8 +101,15 @@ async def decrypt_file(file: UploadFile = File(...), password: str = Form(...)):
 
     decrypted = aes.decrypt(iv, ct, None)
 
+    # split filename and file data
+    separator = b"||"
+    idx = decrypted.find(separator)
+
+    filename = decrypted[:idx].decode()
+    file_data = decrypted[idx + 2:]
+
     return StreamingResponse(
-        iter([decrypted]),
+        iter([file_data]),
         media_type="application/octet-stream",
-        headers={"Content-Disposition": "attachment; filename=decrypted_file"}
+        headers={"Content-Disposition": f"attachment; filename={filename}"}
     )
